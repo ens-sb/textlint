@@ -38,6 +38,9 @@ var lncCmd = &cobra.Command{
 		batches, err := cmd.Flags().GetInt("batches")
 		checkErr(err)
 
+		expLines, err := cmd.Flags().GetInt("exp-lines")
+		checkErr(err)
+
 		files := cmd.Flags().Args()
 		if len(files) != 1 {
 			log.Fatal("Please provide a single file to check")
@@ -59,6 +62,9 @@ var lncCmd = &cobra.Command{
 
 		fmt.Println("Newlines\tNulls\tTabs")
 		fmt.Printf("%d\t%d\t%d\n", globalStats.Newlines, globalStats.Nulls, globalStats.Tabs)
+		if expLines > -1 && globalStats.Newlines != expLines {
+			log.Fatalf("Expected %d lines, but found %d", expLines, globalStats.Newlines)
+		}
 	},
 }
 
@@ -68,5 +74,6 @@ func init() {
 	// Here you will define your flags and configuration settings.
 	lncCmd.Flags().IntP("threads", "j", 4, "Number of cores to use")
 	lncCmd.Flags().IntP("batches", "b", 64, "Number of batches to use")
+	lncCmd.Flags().IntP("exp-lines", "e", -1, "Expected number of lines in the file. If set, will return a non-zero exit code if the count does not match.")
 
 }
